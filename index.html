@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans:200,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      .boxes-container {
+        width: 600px;
+        justify-self: center;
+      }
+
+      .game-title{
+        font-size: 80px;
+        margin-top: 0px;
+        font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        letter-spacing: 10px;
+        font-weight:700;
+        color: rgb(203, 0, 0);
+        -webkit-text-stroke: 1px black;
+        
+      }
+      .box {
+        width: 50px;
+        height: 50px;
+        background-color: grey;
+        border: 1px solid rgb(212, 212, 212);
+      }
+      .water-box {
+        background-color: aqua;
+      }
+
+      .start-box {
+        background-color: red;
+      }
+      .end-box {
+        background-color: green;
+      }
+    </style>
+    <title>MineField!</title>
+  </head>
+  <body class="h-screen flex justify-center">
+    <div class="game-container flex flex-col items-center">
+      <h1 class="game-title">MINEFIELD</h1>
+      <div class="boxes-container flex flex-wrap"></div>
+      <h1 class="game-message">Message</h1>
+    </div>
+    <script>
+      let N = 12;
+      let startIndex = 2;
+      let endIndex = 139;
+      let waterBoxes = [2,5,6,7,9,10,11,14,17,19,21,23,26,29,31,32,33,35,36,37,38,40,41,48,49,52,58,59,60,61,62,64,65,68,69,70,74,77,79,80,85,86,88,89,91,93,94,95,96,97,100,103,104,105,108,109,110,112,113,118,119,120,122,123,125,127,128,129,130,135,136,137,139];
+      let boxesContainer = document.querySelector('.boxes-container');
+      // 10 x 10
+      // loop to generate 100 boxes
+      generateInActiveGameBoard();
+
+      function generateActiveGameBoard() {
+        boxesContainer.innerHTML = '';
+        for (i = 1; i <= N * N; i++) {
+          // generate a box
+          let boxHTML = generateBoxHTML(i);
+          // append it to boxes container
+          boxesContainer.innerHTML += boxHTML;
+        }
+
+        document.querySelectorAll('.box').forEach(function (boxElement) {
+          boxElement.addEventListener('mouseover', function () {
+            if (!waterBoxes.includes(parseInt(boxElement.dataset.index))) {
+              userLost();
+            }
+          });
+        });
+
+        document.querySelector('.end-box').addEventListener('mouseover', function () {
+          updateGameMessage('You won!');
+        });
+
+        document.querySelector('.boxes-container').addEventListener('mouseleave', userLost);
+      }
+
+      function userLost() {
+        // show you lose message
+        updateGameMessage('You lost! Try again.');
+        // reset board
+        generateInActiveGameBoard();
+      }
+
+      function generateInActiveGameBoard() {
+        boxesContainer.innerHTML = '';
+        for (i = 1; i <= N * N; i++) {
+          // generate a box
+          let boxHTML = generateInActiveBox(i);
+          // append it to boxes container
+          boxesContainer.innerHTML += boxHTML;
+        }
+        document.querySelector('.start-box').addEventListener('click', startGame);
+      }
+
+      function startGame() {
+        updateGameMessage('Game started, avoid the gray boxes!');
+        generateActiveGameBoard();
+      }
+
+      function updateGameMessage(message) {
+        document.querySelector('.game-message').innerHTML = message;
+      }
+
+      function generateBoxHTML(i) {
+        let isWater = waterBoxes.includes(i);
+        return `
+        <p data-index=${i} class="box ${i == startIndex ? 'start-box' : ''} ${i == endIndex ? 'end-box' : ''} ${isWater ? 'water-box' : ''}">${i}</p>
+        `;
+      }
+
+      function generateInActiveBox(i) {
+        return `
+        <p class="box ${i == startIndex ? 'start-box' : ''}">${i}</p>
+        `;
+      }
+    </script>
+  </body>
+</html>
